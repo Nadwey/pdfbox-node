@@ -1,0 +1,10 @@
+{
+  "version": "0.0.1",
+  "author": {
+    "name": "Nadwey",
+    "url": "https://github.com/Nadwey/"
+  },
+  "dependencies": {
+    "java": "^0.12.2"
+  }
+}
