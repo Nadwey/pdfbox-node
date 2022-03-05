@@ -1,10 +1,14 @@
 {
+  "name": "pdfbox-node",
   "version": "0.0.1",
+  "description": "Use PDFBox from Node.js",
   "author": {
     "name": "Nadwey",
     "url": "https://github.com/Nadwey/"
   },
   "dependencies": {
     "java": "^0.12.2"
-  }
+  },
+  "keywords": [],
+  "license": "MIT"
 }
