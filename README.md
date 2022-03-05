@@ -4,6 +4,12 @@ Use PDFBox from Node.js
 
 The library is based on https://github.com/pedro-lucas/node-pdfbox
 
+## Installing
+
+```
+npm i https://github.com/Nadwey/pdfbox-node.git
+```
+
 ## Status
 
 -   Super pre-alpha
@@ -13,7 +19,7 @@ The library is based on https://github.com/pedro-lucas/node-pdfbox
 ### Write text
 
 ```js
-const { PDDocument, PDPage, PDPageContentStream, PDType1Font } = require("./index");
+const { PDDocument, PDPage, PDPageContentStream, PDType1Font } = require("pdfbox-node");
 const fs = require("fs");
 
 let doc = PDDocument.create();
