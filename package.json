@@ -1,5 +1,6 @@
 {
-  "name": "pdfbox-node",
+  "name": "@nadwey/pdfbox-node",
+  "repository": "https://github.com/Nadwey/pdfbox-node/",
   "version": "0.0.2",
   "description": "Use PDFBox from Node.js",
   "author": {
