@@ -7,7 +7,7 @@
     "url": "https://github.com/Nadwey/"
   },
   "dependencies": {
-    "java": "github:Nadwey/node-java"
+    "@markusjx/java": "^0.1.2"
   },
   "keywords": [],
   "license": "MIT"
