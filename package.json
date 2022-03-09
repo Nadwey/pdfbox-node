@@ -3,6 +3,7 @@
   "repository": "https://github.com/Nadwey/pdfbox-node/",
   "version": "0.0.2",
   "description": "Use PDFBox from Node.js",
+  "main": "./index.js",
   "author": {
     "name": "Nadwey",
     "url": "https://github.com/Nadwey/"
@@ -11,5 +12,9 @@
     "@markusjx/java": "^0.1.2"
   },
   "keywords": [],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "ts-node": "^10.7.0"
+  },
+  "types": "./index.d.ts"
 }

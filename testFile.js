@@ -5,9 +5,9 @@ const {
     PDType1Font,
     Color,
     PDRectangle,
+    Close,
 } = require("./index");
 const fs = require("fs");
-const { end } = require("./lib/javaInit");
 
 // let doc = PDDocument.loadFromPath("./doc.pdf");
 // let info = doc.getDocumentInformation();
@@ -40,5 +40,5 @@ contentStream.close();
 doc.saveToPath("./doc.pdf");
 doc.close();
 
-end();
+Close();
 process.exit();
