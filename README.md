@@ -19,7 +19,7 @@ npm i https://github.com/Nadwey/pdfbox-node.git
 ### Write text
 
 ```js
-const { PDDocument, PDPage, PDPageContentStream, PDType1Font } = require("@nadwey/pdfbox-node");
+const { Close, PDDocument, PDPage, PDPageContentStream, PDType1Font } = require("@nadwey/pdfbox-node");
 const fs = require("fs");
 
 let doc = PDDocument.create();
@@ -37,5 +37,6 @@ contentStream.close();
 doc.saveToPath("./doc.pdf");
 doc.close();
 
+Close();
 process.exit();
 ```
