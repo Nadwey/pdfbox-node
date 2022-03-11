@@ -12,7 +12,9 @@ npm i https://github.com/Nadwey/pdfbox-node.git
 
 ## Status
 
--   Super pre-alpha
+- Pre-alpha
+- Writing tests...
+- Making async methods...
 
 ## Examples
 
