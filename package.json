@@ -4,6 +4,9 @@
   "version": "0.0.2",
   "description": "Use PDFBox from Node.js",
   "main": "./index.js",
+  "scripts": {
+    "test": "jest"
+  },
   "author": {
     "name": "Nadwey",
     "url": "https://github.com/Nadwey/"
