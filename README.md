@@ -7,7 +7,7 @@ The library is based on https://github.com/pedro-lucas/node-pdfbox
 ## Installing
 
 ```
-npm i https://github.com/Nadwey/pdfbox-node.git
+npm i https://github.com/Nadwey/pdfbox-node.git#development
 ```
 
 ## Status
