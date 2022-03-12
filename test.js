@@ -6,8 +6,153 @@ const {
     PDRectangle,
     PDDocumentInformation,
     PDPageTree,
+    MemoryUsageSetting,
+    PDFMergerUtility,
 } = require("./index");
 const path = require("path");
+
+/**
+ * 
+ * @param {any} c class
+ * @param {Function} fun 
+ * @param  {...any} args 
+ * @returns 
+ */
+async function testAsync(c, fun, ...args) {
+    let funPromise = fun.apply(c, args);
+    expect(funPromise).toBeInstanceOf(Promise);
+    return await funPromise;
+}
+
+describe("MemoryUsageSetting", () => {
+    test("getMaxMainMemoryBytes", () => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly(1234n);
+        expect(mus.getMaxMainMemoryBytes()).toBe(1234n);
+    });
+
+    test("getMaxMainMemoryBytesAsync", async() => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly(1234n);
+        expect(await testAsync(mus, mus.getMaxMainMemoryBytesAsync)).toBe(1234n);
+    });
+
+    test("getMaxStorageBytes", () => {
+        let mus = MemoryUsageSetting.setupTempFileOnly(1234n);
+        expect(mus.getMaxStorageBytes()).toBe(1234n);
+    });
+
+    test("getMaxStorageBytesAsync", async() => {
+        let mus = MemoryUsageSetting.setupTempFileOnly(1234n);
+        expect(await testAsync(mus, mus.getMaxStorageBytesAsync)).toBe(1234n);
+    });
+
+    test("getPartitionedCopy", () => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly(1234n);
+        let copy = mus.getPartitionedCopy(2);
+        expect(copy.getMaxMainMemoryBytes()).toBe(1234n / 2n);
+    });
+
+    test("getPartitionedCopyAsync", async() => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly(1234n);
+        let copy = await testAsync(mus, mus.getPartitionedCopyAsync, 2);
+        expect(copy.getMaxMainMemoryBytes()).toBe(1234n / 2n);
+    });
+
+    test("getTempDir", () => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly();
+        mus.setTempDir("test123.pdf");
+        expect(mus.getTempDir()).toBe("test123.pdf");
+    });
+
+    test("getTempDirAsync", async() => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly();
+        mus.setTempDir("test123.pdf");
+        expect(await testAsync(mus, mus.getTempDirAsync)).toBe("test123.pdf");
+    });
+
+    test("isMainMemoryRestricted", () => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly(-1n);
+        expect(mus.isMainMemoryRestricted()).toBe(false);
+        let mus2 = MemoryUsageSetting.setupMainMemoryOnly(1234n);
+        expect(mus2.isMainMemoryRestricted()).toBe(true);
+    });
+
+    test("isMainMemoryRestrictedAsync", async() => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly(-1n);
+        expect(await testAsync(mus, mus.isMainMemoryRestrictedAsync)).toBe(false);
+        let mus2 = MemoryUsageSetting.setupMainMemoryOnly(1234n);
+        expect(await testAsync(mus2, mus2.isMainMemoryRestrictedAsync)).toBe(true);
+    });
+
+    test("isStorageRestricted", () => {
+        let mus = MemoryUsageSetting.setupTempFileOnly(-1n);
+        expect(mus.isStorageRestricted()).toBe(false);
+        let mus2 = MemoryUsageSetting.setupTempFileOnly(1234n);
+        expect(mus2.isStorageRestricted()).toBe(true);
+    });
+
+    test("isStorageRestrictedAsync", async() => {
+        let mus = MemoryUsageSetting.setupTempFileOnly(-1n);
+        expect(await testAsync(mus, mus.isStorageRestrictedAsync)).toBe(false);
+        let mus2 = MemoryUsageSetting.setupTempFileOnly(1234n);
+        expect(await testAsync(mus2, mus2.isStorageRestrictedAsync)).toBe(true);
+    });
+
+    test("setTempDir", () => {
+        let mus = MemoryUsageSetting.setupTempFileOnly();
+        mus.setTempDir("test123.pdf");
+        expect(mus.getTempDir()).toBe("test123.pdf");
+    });
+
+    test("setTempDirAsync", async() => {
+        let mus = MemoryUsageSetting.setupTempFileOnly();
+        await testAsync(mus, mus.setTempDirAsync, "test123.pdf");
+        expect(mus.getTempDir()).toBe("test123.pdf");
+    });
+
+    test("useMainMemory", () => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly();
+        expect(mus.useMainMemory()).toBe(true);
+
+        let mus2 = MemoryUsageSetting.setupMixed(1234n);
+        expect(mus2.useMainMemory()).toBe(true);
+
+        let mus3 = MemoryUsageSetting.setupTempFileOnly();
+        expect(mus3.useMainMemory()).toBe(false);
+    });
+
+    test("useMainMemoryAsync", async() => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly();
+        expect(await testAsync(mus, mus.useMainMemoryAsync)).toBe(true);
+
+        let mus2 = MemoryUsageSetting.setupMixed(1234n);
+        expect(await testAsync(mus2, mus2.useMainMemoryAsync)).toBe(true);
+
+        let mus3 = MemoryUsageSetting.setupTempFileOnly();
+        expect(await testAsync(mus3, mus3.useMainMemoryAsync)).toBe(false);
+    });
+
+    test("useTempFile", () => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly();
+        expect(mus.useTempFile()).toBe(false);
+
+        let mus2 = MemoryUsageSetting.setupMixed(1234n);
+        expect(mus2.useTempFile()).toBe(true);
+
+        let mus3 = MemoryUsageSetting.setupTempFileOnly();
+        expect(mus3.useTempFile()).toBe(true);
+    });
+
+    test("useTempFileAsync", async() => {
+        let mus = MemoryUsageSetting.setupMainMemoryOnly();
+        expect(await testAsync(mus, mus.useTempFileAsync)).toBe(false);
+
+        let mus2 = MemoryUsageSetting.setupMixed(1234n);
+        expect(await testAsync(mus2, mus2.useTempFileAsync)).toBe(true);
+
+        let mus3 = MemoryUsageSetting.setupTempFileOnly();
+        expect(await testAsync(mus3, mus3.useTempFileAsync)).toBe(true);
+    });
+});
 
 describe("PDDocument", () => {
     test("create", () => {
@@ -98,7 +243,7 @@ describe("PDDocument", () => {
 
     test("getNumberOfPagesAsync", async () => {
         let doc = PDDocument.create();
-        
+
         expect(doc.getNumberOfPagesAsync()).toBeInstanceOf(Promise);
         expect(await doc.getNumberOfPagesAsync()).toBe(0);
         doc.addPage(PDPage.create(PDRectangle.LETTER));
@@ -576,6 +721,14 @@ describe("PDDocumentInformation", () => {
         expect(info.setTrappedAsync("True")).toBeInstanceOf(Promise);
         expect(info.setTrappedAsync("False")).toBeInstanceOf(Promise);
         expect(info.setTrappedAsync("Unknown")).toBeInstanceOf(Promise);
+    });
+});
+
+// TODO
+describe("PDFMergerUtility", () => {
+    test("create", () => {
+        let merger = PDFMergerUtility.create();
+        expect(merger).toBeInstanceOf(PDFMergerUtility);
     });
 });
 
