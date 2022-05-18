@@ -18,11 +18,11 @@ jobs:
         runs-on: ${{ matrix.os }}
 
         steps:
-        - name: Test
-        - uses: actions/setup-java@v3
-          with:
-            distribution: 'adopt'
-            java-version: ${{ matrix.java }}
-        - run: |
-            npm ci
-            npm run test
+            - name: Test
+              uses: actions/setup-java@v3
+              with:
+                  distribution: "adopt"
+                  java-version: ${{ matrix.java }}
+              run: |
+                  npm ci
+                  npm run test
