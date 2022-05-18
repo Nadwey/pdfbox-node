@@ -23,7 +23,6 @@ jobs:
           with:
             distribution: 'adopt'
             java-version: ${{ matrix.java }}
-            
         - run: |
             npm ci
             npm run test
