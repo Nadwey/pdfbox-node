@@ -3,7 +3,7 @@ name: "CodeQL"
 on: [push]
 jobs:
     analyze:
-        name: Analyze & Test
+        name: Analyze
 
         permissions:
             actions: read
@@ -14,9 +14,7 @@ jobs:
             fail-fast: false
             matrix:
                 language: ["javascript"]
-                os: [windows-latest, ubuntu-latest, macos-latest]
-
-        runs-on: ${{ matrix.os }}
+        runs-on: ubuntu-latest
 
         steps:
             - name: Checkout repository
