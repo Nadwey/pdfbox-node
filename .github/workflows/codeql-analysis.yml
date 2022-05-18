@@ -50,6 +50,7 @@ jobs:
     # If this step fails, then you should remove it and run the build manually (see below)
     - name: Test
       run: |
+        npm i
         npm run test
 
     # ℹ️ Command-line programs to run using the OS shell.
