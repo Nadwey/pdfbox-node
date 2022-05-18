@@ -8,15 +8,38 @@ const {
     PDPageTree,
     MemoryUsageSetting,
     PDFMergerUtility,
+    PDPageContentStream,
+    PDType1Font,
 } = require("./index");
 const path = require("path");
+const fs = require("fs");
 
 /**
- * 
+ * Creates document for testing
+ */
+const createTempDocument = () => {
+    let doc = PDDocument.create();
+    let page = PDPage.create();
+    doc.addPage(page);
+
+    let contentStream = PDPageContentStream.create(doc, page);
+    contentStream.setFont(PDType1Font.HELVETICA, 50);
+    contentStream.beginText();
+    contentStream.newLineAtOffset(50, 50);
+    contentStream.showText("temp doc");
+    contentStream.endText();
+    contentStream.close();
+
+    doc.saveToPath("./temp-doc.pdf");
+    doc.close();
+}
+
+/**
+ *
  * @param {any} c class
- * @param {Function} fun 
- * @param  {...any} args 
- * @returns 
+ * @param {Function} fun
+ * @param  {...any} args
+ * @returns
  */
 async function testAsync(c, fun, ...args) {
     let funPromise = fun.apply(c, args);
@@ -24,13 +47,15 @@ async function testAsync(c, fun, ...args) {
     return await funPromise;
 }
 
+describe("Creating temp pdf", () => {});
+
 describe("MemoryUsageSetting", () => {
     test("getMaxMainMemoryBytes", () => {
         let mus = MemoryUsageSetting.setupMainMemoryOnly(1234n);
         expect(mus.getMaxMainMemoryBytes()).toBe(1234n);
     });
 
-    test("getMaxMainMemoryBytesAsync", async() => {
+    test("getMaxMainMemoryBytesAsync", async () => {
         let mus = MemoryUsageSetting.setupMainMemoryOnly(1234n);
         expect(await testAsync(mus, mus.getMaxMainMemoryBytesAsync)).toBe(1234n);
     });
@@ -40,7 +65,7 @@ describe("MemoryUsageSetting", () => {
         expect(mus.getMaxStorageBytes()).toBe(1234n);
     });
 
-    test("getMaxStorageBytesAsync", async() => {
+    test("getMaxStorageBytesAsync", async () => {
         let mus = MemoryUsageSetting.setupTempFileOnly(1234n);
         expect(await testAsync(mus, mus.getMaxStorageBytesAsync)).toBe(1234n);
     });
@@ -51,7 +76,7 @@ describe("MemoryUsageSetting", () => {
         expect(copy.getMaxMainMemoryBytes()).toBe(1234n / 2n);
     });
 
-    test("getPartitionedCopyAsync", async() => {
+    test("getPartitionedCopyAsync", async () => {
         let mus = MemoryUsageSetting.setupMainMemoryOnly(1234n);
         let copy = await testAsync(mus, mus.getPartitionedCopyAsync, 2);
         expect(copy.getMaxMainMemoryBytes()).toBe(1234n / 2n);
@@ -63,7 +88,7 @@ describe("MemoryUsageSetting", () => {
         expect(mus.getTempDir()).toBe("test123.pdf");
     });
 
-    test("getTempDirAsync", async() => {
+    test("getTempDirAsync", async () => {
         let mus = MemoryUsageSetting.setupMainMemoryOnly();
         mus.setTempDir("test123.pdf");
         expect(await testAsync(mus, mus.getTempDirAsync)).toBe("test123.pdf");
@@ -76,7 +101,7 @@ describe("MemoryUsageSetting", () => {
         expect(mus2.isMainMemoryRestricted()).toBe(true);
     });
 
-    test("isMainMemoryRestrictedAsync", async() => {
+    test("isMainMemoryRestrictedAsync", async () => {
         let mus = MemoryUsageSetting.setupMainMemoryOnly(-1n);
         expect(await testAsync(mus, mus.isMainMemoryRestrictedAsync)).toBe(false);
         let mus2 = MemoryUsageSetting.setupMainMemoryOnly(1234n);
@@ -90,7 +115,7 @@ describe("MemoryUsageSetting", () => {
         expect(mus2.isStorageRestricted()).toBe(true);
     });
 
-    test("isStorageRestrictedAsync", async() => {
+    test("isStorageRestrictedAsync", async () => {
         let mus = MemoryUsageSetting.setupTempFileOnly(-1n);
         expect(await testAsync(mus, mus.isStorageRestrictedAsync)).toBe(false);
         let mus2 = MemoryUsageSetting.setupTempFileOnly(1234n);
@@ -103,7 +128,7 @@ describe("MemoryUsageSetting", () => {
         expect(mus.getTempDir()).toBe("test123.pdf");
     });
 
-    test("setTempDirAsync", async() => {
+    test("setTempDirAsync", async () => {
         let mus = MemoryUsageSetting.setupTempFileOnly();
         await testAsync(mus, mus.setTempDirAsync, "test123.pdf");
         expect(mus.getTempDir()).toBe("test123.pdf");
@@ -120,7 +145,7 @@ describe("MemoryUsageSetting", () => {
         expect(mus3.useMainMemory()).toBe(false);
     });
 
-    test("useMainMemoryAsync", async() => {
+    test("useMainMemoryAsync", async () => {
         let mus = MemoryUsageSetting.setupMainMemoryOnly();
         expect(await testAsync(mus, mus.useMainMemoryAsync)).toBe(true);
 
@@ -142,7 +167,7 @@ describe("MemoryUsageSetting", () => {
         expect(mus3.useTempFile()).toBe(true);
     });
 
-    test("useTempFileAsync", async() => {
+    test("useTempFileAsync", async () => {
         let mus = MemoryUsageSetting.setupMainMemoryOnly();
         expect(await testAsync(mus, mus.useTempFileAsync)).toBe(false);
 
@@ -164,7 +189,9 @@ describe("PDDocument", () => {
     });
 
     test("loadFromPath", () => {
-        let doc = PDDocument.loadFromPath(path.join(__dirname, "./testDoc.pdf"));
+        createTempDocument();
+
+        let doc = PDDocument.loadFromPath(path.join(__dirname, "./temp-doc.pdf"));
 
         expect(doc.getPage(0)).toBeInstanceOf(PDPage);
         expect(() => {
@@ -172,10 +199,14 @@ describe("PDDocument", () => {
         }).toThrow();
 
         doc.close();
+
+        fs.rmSync("./temp-doc.pdf");
     });
 
     test("loadFromPathAsync", async () => {
-        let docLoad = PDDocument.loadFromPathAsync(path.join(__dirname, "./testDoc.pdf"));
+        createTempDocument();
+
+        let docLoad = PDDocument.loadFromPathAsync(path.join(__dirname, "./temp-doc.pdf"));
 
         expect(docLoad).toBeInstanceOf(Promise);
         let doc = await docLoad;
@@ -185,6 +216,8 @@ describe("PDDocument", () => {
         }).toThrow();
 
         doc.close();
+        
+        fs.rmSync("./temp-doc.pdf");
     });
 
     test("addPage", () => {
@@ -296,7 +329,7 @@ describe("PDDocument", () => {
         doc.close();
     });
 
-    test("importPage - TODO", () => {
+    test("importPage", () => {
         let docIn = PDDocument.create();
 
         docIn.addPage(PDPage.create(PDRectangle.LEGAL));
@@ -304,7 +337,6 @@ describe("PDDocument", () => {
         let docOut = PDDocument.create();
         let importedPage = docOut.importPage(docIn.getPage(0));
         docIn.removePage(0);
-        // TODO, better checking
         expect(importedPage).toBeInstanceOf(PDPage);
         expect(() => {
             docIn.getPage(0);
@@ -314,7 +346,7 @@ describe("PDDocument", () => {
         docIn.close();
     });
 
-    test("importPageAsync - TODO", async () => {
+    test("importPageAsync", async () => {
         let docIn = PDDocument.create();
 
         docIn.addPage(PDPage.create(PDRectangle.LEGAL));
@@ -324,7 +356,6 @@ describe("PDDocument", () => {
         expect(importedPagePromise).toBeInstanceOf(Promise);
         let importedPage = await importedPagePromise;
         docIn.removePage(0);
-        // TODO, better checking
         expect(importedPage).toBeInstanceOf(PDPage);
         expect(() => {
             docIn.getPage(0);
@@ -380,13 +411,44 @@ describe("PDDocument", () => {
     });
 
     test("saveToPath", () => {
-        let working = this;
-        expect(this).toBe(working);
+        let doc = PDDocument.create();
+        let page = PDPage.create();
+        doc.addPage(page);
+
+        let contentStream = PDPageContentStream.create(doc, page);
+        contentStream.setFont(PDType1Font.HELVETICA, 50);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(50, 50);
+        contentStream.showText("temp doc");
+        contentStream.endText();
+        contentStream.close();
+
+        doc.saveToPath("./temp-doc.pdf");
+        doc.close();
+
+        expect(fs.existsSync("./temp-doc.pdf")).toBe(true);
+        fs.rmSync("./temp-doc.pdf");
     });
 
-    test("saveToPathAsync", () => {
-        let working = this;
-        expect(this).toBe(working);
+    test("saveToPathAsync", async() => {
+        let doc = PDDocument.create();
+        let page = PDPage.create();
+        doc.addPage(page);
+
+        let contentStream = PDPageContentStream.create(doc, page);
+        contentStream.setFont(PDType1Font.HELVETICA, 50);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(50, 50);
+        contentStream.showText("temp doc");
+        contentStream.endText();
+        contentStream.close();
+
+        await testAsync(doc, doc.saveToPathAsync, "./temp-doc.pdf");
+
+        doc.close();
+
+        expect(fs.existsSync("./temp-doc.pdf")).toBe(true);
+        fs.rmSync("./temp-doc.pdf");
     });
 
     test("setDocumentInformation", () => {
