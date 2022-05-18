@@ -12,12 +12,11 @@
     "url": "https://github.com/Nadwey/"
   },
   "dependencies": {
-    "@markusjx/java": "^0.1.2"
+    "@markusjx/java": "^0.1.3"
   },
   "keywords": [],
   "license": "MIT",
-  "types": "./index.d.ts",
   "devDependencies": {
-    "jest": "^27.5.1"
+    "jest": "^28.1.0"
   }
 }
