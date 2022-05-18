@@ -20,9 +20,9 @@ jobs:
         steps:
         - name: Test
         - uses: actions/setup-java@v3
-            with:
-              distribution: 'adopt'
-              java-version: ${{ matrix.java }}
+          with:
+            distribution: 'adopt'
+            java-version: ${{ matrix.java }}
             
         - run: |
             npm ci
